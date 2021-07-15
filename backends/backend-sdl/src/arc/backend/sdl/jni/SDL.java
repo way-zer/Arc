@@ -171,7 +171,9 @@ public class SDL{
     */
 
     public static native long SDL_CreateWindow(String title, int w, int h, int flags); /*
-        return (jlong)SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags);
+        SDL_Window* window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags);
+        ((SDL_VideoData *)SDL_GetCurrentVideoDriver()->driverdata).ime_uiless = SDL_FALSE;
+        return (jlong)window;
     */
 
     public static native void SDL_DestroyWindow(long handle); /*
