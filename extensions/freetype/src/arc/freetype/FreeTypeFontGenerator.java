@@ -1,5 +1,6 @@
 package arc.freetype;
 
+import arc.*;
 import arc.freetype.FreeType.*;
 import arc.struct.Seq;
 import arc.files.Fi;
@@ -731,12 +732,18 @@ public class FreeTypeFontGenerator implements Disposable{
             return glyph;
         }
 
+        //MDTX: Don't update fonts more than once per frame (from https://github.com/mindustry-antigrief/Arc/commit/fed63f365839b5d0d3e8b6fe02307c373360e36e)
+        private boolean queued;
         public void getGlyphs(GlyphRun run, CharSequence str, int start, int end, Glyph lastGlyph){
             if(packer != null) packer.setPackToTexture(true); // All glyphs added after this are packed directly to the texture.
             super.getGlyphs(run, str, start, end, lastGlyph);
-            if(dirty && !ignoreDirty){
-                dirty = false;
-                packer.updateTextureRegions(regions, parameter.minFilter, parameter.magFilter, parameter.genMipMaps);
+
+            if(dirty && !queued){
+                queued = true;
+                Core.app.post(() -> {
+                    dirty = queued = false;
+                    packer.updateTextureRegions(regions, parameter.minFilter, parameter.magFilter, parameter.genMipMaps);
+                });
             }
         }
 
